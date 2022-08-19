@@ -146,3 +146,7 @@ class TestCheck(unittest.TestCase):
         self.assertEqual(code, Status.CRITICAL)
         self.assertEqual(message, 'critical critical2')
 
+        (code, message) = c.check_messages(separator_all='; ')
+        self.assertEqual(code, Status.CRITICAL)
+        self.assertEqual(message, 'critical critical2; warning; ok')
+

@@ -154,7 +154,7 @@ class Check:
         self._perfdata.append( PerformanceLabel(**kwargs) )
 
 
-    def check_messages(self, separator=' '):
+    def check_messages(self, separator=' ', separator_all=None):
         code = Status.OK
 
         if self._messages[Status.CRITICAL]:
@@ -162,7 +162,16 @@ class Check:
         elif self._messages[Status.WARNING]:
             code = Status.WARNING
 
-        return (code, separator.join(self._messages[code]))
+        if separator_all:
+            message = separator_all.join([
+                separator.join(self._messages[Status.CRITICAL]),
+                separator.join(self._messages[Status.WARNING]),
+                separator.join(self._messages[Status.OK])
+            ])
+        else:
+            message = separator.join(self._messages[code])
+
+        return (code, message)
 
     def check_threshold(self, *args):
         return self.threshold.get_status(*args)
