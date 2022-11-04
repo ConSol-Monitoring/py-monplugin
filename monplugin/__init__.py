@@ -154,7 +154,17 @@ class Check:
         self._perfdata.append( PerformanceLabel(**kwargs) )
 
 
-    def check_messages(self, separator=' ', separator_all=None):
+    def check_messages(self, separator=' ', separator_all=None, allok=None):
+        """
+        return the highest message code and the message as a tupel
+
+        Optional keyword arguments:
+        separator: like Monitoring::Plugins check_messages join
+        separator_all: like Monitoring::Plugins check_messages join_all
+        allok: if used with separator_all only no ok messages are returned
+               the value of allok is returned as a message if the check is OK
+               and there was no other OK message added to the check object
+        """
         code = Status.OK
 
         if self._messages[Status.CRITICAL]:
@@ -163,13 +173,20 @@ class Check:
             code = Status.WARNING
 
         if separator_all:
-            message = separator_all.join([
+            messages = [
                 separator.join(self._messages[Status.CRITICAL]),
                 separator.join(self._messages[Status.WARNING]),
-                separator.join(self._messages[Status.OK])
-            ])
+            ]
+            if not allok:
+                messages.append(
+                    separator.join(self._messages[Status.OK])
+                )
+            message = separator_all.join(messages)
         else:
             message = separator.join(self._messages[code])
+
+        if allok and code == Status.OK and not self._messages[Status.OK]:
+            message = allok
 
         return (code, message)
 
