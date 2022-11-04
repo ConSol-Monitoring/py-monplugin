@@ -139,6 +139,10 @@ class TestCheck(unittest.TestCase):
         self.assertEqual(code, Status.OK)
         self.assertEqual(message, 'ok')
 
+        (code, message) = c.check_messages(separator_all='; ', allok="ALLOK")
+        self.assertEqual(code, Status.OK)
+        self.assertEqual(message, 'ALLOK')
+
         c.add_message(Status.WARNING, 'warning')
         (code, message) = c.check_messages()
         self.assertEqual(code, Status.WARNING)

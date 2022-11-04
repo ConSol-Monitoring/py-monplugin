@@ -163,7 +163,7 @@ class Check:
         separator_all: like Monitoring::Plugins check_messages join_all
         allok: if used with separator_all only no ok messages are returned
                the value of allok is returned as a message if the check is OK
-               and there was no other OK message added to the check object
+               instead of the individual ok messages added to the object
         """
         code = Status.OK
 
@@ -185,7 +185,7 @@ class Check:
         else:
             message = separator.join(self._messages[code])
 
-        if allok and code == Status.OK and not self._messages[Status.OK]:
+        if allok and code == Status.OK:
             message = allok
 
         return (code, message)
