@@ -130,10 +130,18 @@ class TestCheck(unittest.TestCase):
         self.assertEqual(code, Status.OK)
         self.assertEqual(message, '')
 
+        (code, message) = c.check_messages(separator_all='; ', allok="ALLOK")
+        self.assertEqual(code, Status.OK)
+        self.assertEqual(message, 'ALLOK')
+
         c.add_message(Status.OK, 'ok')
         (code, message) = c.check_messages()
         self.assertEqual(code, Status.OK)
         self.assertEqual(message, 'ok')
+
+        (code, message) = c.check_messages(separator_all='; ', allok="ALLOK")
+        self.assertEqual(code, Status.OK)
+        self.assertEqual(message, 'ALLOK')
 
         c.add_message(Status.WARNING, 'warning')
         (code, message) = c.check_messages()
@@ -149,4 +157,8 @@ class TestCheck(unittest.TestCase):
         (code, message) = c.check_messages(separator_all='; ')
         self.assertEqual(code, Status.CRITICAL)
         self.assertEqual(message, 'critical critical2; warning; ok')
+
+        (code, message) = c.check_messages(separator_all='; ', allok="ALLOK")
+        self.assertEqual(code, Status.CRITICAL)
+        self.assertEqual(message, 'critical critical2; warning')
 
