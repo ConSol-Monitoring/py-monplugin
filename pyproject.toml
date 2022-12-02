@@ -1,0 +1,20 @@
+[build-system]
+build-backend = "flit_core.buildapi"
+requires = ["flit_core >=3.2,<4"]
+
+[project]
+name = "monplugin"
+description = "Partial python port of perls Monitoring::Plugin"
+version = "0.4"
+authors = [
+    { name = "Danijel Tasov", email = "danijel.tasov@consol.de" }
+]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Topic :: System :: Monitoring",
+    "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
+]
+
+
+[tool.flit.sdist]
+exclude = ["docs/", "stuff/"]
