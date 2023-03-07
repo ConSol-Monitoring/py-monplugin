@@ -173,10 +173,12 @@ class Check:
             code = Status.WARNING
 
         if separator_all:
-            messages = [
-                separator.join(self._messages[Status.CRITICAL]),
-                separator.join(self._messages[Status.WARNING]),
-            ]
+            messages = []
+            for s in [Status.CRITICAL, Status.WARNING]:
+                if self._messages[s]:
+                    messages.append(
+                        separator.join(self._messages[s]),
+                    )
             if not allok:
                 messages.append(
                     separator.join(self._messages[Status.OK])

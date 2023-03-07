@@ -162,3 +162,10 @@ class TestCheck(unittest.TestCase):
         self.assertEqual(code, Status.CRITICAL)
         self.assertEqual(message, 'critical critical2; warning')
 
+        c = Check('x')
+        c.add_message(Status.OK, 'ok1')
+        c.add_message(Status.OK, 'ok2')
+        c.add_message(Status.OK, 'ok3')
+        (code, message) = c.check_messages(separator_all='\n', separator='\n')
+        self.assertEqual(code, Status.OK)
+        self.assertEqual(message, 'ok1\nok2\nok3')
