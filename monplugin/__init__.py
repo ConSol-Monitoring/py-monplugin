@@ -1,10 +1,14 @@
 import enum
+import io
 
 class Status(enum.Enum):
     OK       = 0
     WARNING  = 1
     CRITICAL = 2
     UNKNOWN  = 3
+
+class MonIllegalInstruction(Exception):
+    pass
 
 class Range:
     def __init__(self, range_spec=None):
@@ -128,6 +132,7 @@ class Check:
         self.shortname = shortname
         self.set_threshold(threshold)
         self._perfdata = []
+        self._perfmultidata = {}
         self._messages = {
             Status.OK: [],
             Status.WARNING: [],
@@ -151,7 +156,17 @@ class Check:
             self._messages[status].append(m)
 
     def add_perfdata(self, **kwargs):
+        if self._perfmultidata:
+            raise MonIllegalInstruction("you already used add_perfmultidata")
+
         self._perfdata.append( PerformanceLabel(**kwargs) )
+
+    def add_perfmultidata(self, entity, check, **kwargs):
+        if self._perfdata:
+            raise MonIllegalInstruction("you already used add_perfdata")
+
+        self._perfmultidata.setdefault((entity, check), [])
+        self._perfmultidata[(entity,check)].append( PerformanceLabel(**kwargs) )
 
 
     def check_messages(self, separator=' ', separator_all=None, allok=None):
@@ -205,8 +220,24 @@ class Check:
             text=message
         ))
 
-        if self._perfdata:
-            print("| ", end='')
-            print('\n'.join([ str(x) for x in self._perfdata ]))
-
+        print(self.get_perfdata())
         raise SystemExit(code.value)
+
+    def get_perfdata(self):
+        output = io.StringIO()
+
+        if self._perfdata:
+            output.write("| ")
+            output.write('\n'.join([ str(x) for x in self._perfdata ]))
+
+        if self._perfmultidata:
+            output.write("| ")
+            for k,labels in self._perfmultidata.items():
+                entity, check = k
+                output.write(f"'{entity}::{check}::")
+                ps = " ".join([str(x) for x in labels])
+                output.write(ps[1:])
+                output.write("\n")
+
+        return output.getvalue()
+
