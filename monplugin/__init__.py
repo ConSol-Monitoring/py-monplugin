@@ -1,5 +1,6 @@
 import enum
 import io
+import re
 
 class Status(enum.Enum):
     OK       = 0
@@ -165,6 +166,15 @@ class Check:
         if self._perfdata:
             raise MonIllegalInstruction("you already used add_perfdata")
 
+        if re.match(r"[^A-Za-z0-9]", entity):
+            raise ValueError("just use [A-Za-z0-9] for entity")
+
+        if not check:
+            check = self.shortname.lower() or "unknown"
+
+        if re.match(r"[^A-Za-z0-9]", check):
+            raise ValueError("just use [A-Za-z0-9] for check")
+
         self._perfmultidata.setdefault((entity, check), [])
         self._perfmultidata[(entity,check)].append( PerformanceLabel(**kwargs) )
 
@@ -235,7 +245,7 @@ class Check:
             for k,labels in self._perfmultidata.items():
                 entity, check = k
                 output.write(f"'{entity}::{check}::")
-                ps = " ".join([str(x) for x in labels])
+                ps = " ".join(sorted([str(x) for x in labels]))
                 output.write(ps[1:])
                 output.write("\n")
 
