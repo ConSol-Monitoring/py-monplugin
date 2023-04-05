@@ -185,14 +185,8 @@ class Check:
         if self._perfdata:
             raise MonIllegalInstruction("you already used add_perfdata")
 
-        if re.match(r"[^A-Za-z0-9]", entity):
-            raise ValueError("just use [A-Za-z0-9] for entity")
-
         if not check:
             check = self.shortname.lower() or "unknown"
-
-        if re.match(r"[^A-Za-z0-9]", check):
-            raise ValueError("just use [A-Za-z0-9] for check")
 
         self._perfmultidata.setdefault((entity, check), [])
         self._perfmultidata[(entity,check)].append( PerformanceLabel(**kwargs) )
