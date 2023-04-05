@@ -15,12 +15,18 @@
 
 
 import enum
+import io
+import re
+import time
 
 class Status(enum.Enum):
     OK       = 0
     WARNING  = 1
     CRITICAL = 2
     UNKNOWN  = 3
+
+class MonIllegalInstruction(Exception):
+    pass
 
 class Range:
     def __init__(self, range_spec=None):
@@ -144,11 +150,14 @@ class Check:
         self.shortname = shortname
         self.set_threshold(threshold)
         self._perfdata = []
+        self._perfmultidata = {}
         self._messages = {
             Status.OK: [],
             Status.WARNING: [],
             Status.CRITICAL: [],
         }
+
+        self.start_time = time.perf_counter()
 
     def set_threshold(self, threshold=None, **kwargs):
         if threshold:
@@ -167,7 +176,26 @@ class Check:
             self._messages[status].append(m)
 
     def add_perfdata(self, **kwargs):
+        if self._perfmultidata:
+            raise MonIllegalInstruction("you already used add_perfmultidata")
+
         self._perfdata.append( PerformanceLabel(**kwargs) )
+
+    def add_perfmultidata(self, entity, check, **kwargs):
+        if self._perfdata:
+            raise MonIllegalInstruction("you already used add_perfdata")
+
+        if re.match(r"[^A-Za-z0-9]", entity):
+            raise ValueError("just use [A-Za-z0-9] for entity")
+
+        if not check:
+            check = self.shortname.lower() or "unknown"
+
+        if re.match(r"[^A-Za-z0-9]", check):
+            raise ValueError("just use [A-Za-z0-9] for check")
+
+        self._perfmultidata.setdefault((entity, check), [])
+        self._perfmultidata[(entity,check)].append( PerformanceLabel(**kwargs) )
 
 
     def check_messages(self, separator=' ', separator_all=None, allok=None):
@@ -221,8 +249,26 @@ class Check:
             text=message
         ))
 
-        if self._perfdata:
-            print("| ", end='')
-            print('\n'.join([ str(x) for x in self._perfdata ]))
-
+        print(self.get_perfdata())
         raise SystemExit(code.value)
+
+    def get_perfdata(self):
+        output = io.StringIO()
+
+        if self._perfdata:
+            output.write("| ")
+            output.write('\n'.join([ str(x) for x in self._perfdata ]))
+            output.write(f"\n'monplugin_time'={ time.perf_counter() - self.start_time :.6f}s\n")
+
+        if self._perfmultidata:
+            output.write("| ")
+            output.write(f"'monplugin::monplugin::time'={ time.perf_counter() - self.start_time :.6f}s ")
+            for k,labels in self._perfmultidata.items():
+                entity, check = k
+                output.write(f"'{entity}::{check}::")
+                ps = " ".join(sorted([str(x) for x in labels]))
+                output.write(ps[1:])
+                output.write("\n")
+
+        return output.getvalue()
+

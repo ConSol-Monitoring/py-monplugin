@@ -1,5 +1,6 @@
 from monplugin import Threshold, Range, Status, PerformanceLabel, Check
 import unittest
+import re
 
 
 class TestRange(unittest.TestCase):
@@ -123,6 +124,48 @@ class TestPerfromanceLabel(unittest.TestCase):
         self.assertEqual(str(p), "'a b'=9.0kB;15;90:;;")
 
 class TestCheck(unittest.TestCase):
+    def test_perfmulti(self):
+        c = Check('x')
+        c.add_message('OK')
+        c.add_perfmultidata('disk1', None, label='used', value='90')
+        c.add_perfmultidata('disk1', None, label='free', value='10')
+        c.add_perfmultidata('disk2', None, label='free', value='5')
+        c.add_perfmultidata('disk2', None, label='used', value='95')
+
+        rmtime = lambda x: re.sub(r"'monplugin::monplugin::time[^ ]* ", "", x)
+
+        self.assertEqual(
+            rmtime(c.get_perfdata()),
+                "| 'disk1::x::free'=10.0;;;; 'used'=90.0;;;;\n"
+                "'disk2::x::free'=5.0;;;; 'used'=95.0;;;;\n"
+        )
+
+        c = Check()
+        c.add_message('OK')
+        c.add_perfmultidata('disk1', None, label='used', value='90')
+        c.add_perfmultidata('disk1', None, label='free', value='10')
+        self.assertEqual(
+            rmtime(c.get_perfdata()),
+                "| 'disk1::unknown::free'=10.0;;;; 'used'=90.0;;;;\n"
+        )
+
+        c = Check()
+        c.add_message('OK')
+        c.add_perfmultidata('disk1', "a", label='used', value='90')
+        c.add_perfmultidata('disk1', "a", label='free', value='10')
+        self.assertEqual(
+            rmtime(c.get_perfdata()),
+                "| 'disk1::a::free'=10.0;;;; 'used'=90.0;;;;\n"
+        )
+
+        c = Check()
+        c.add_message('OK')
+        c.add_perfdata(label='used', value=90)
+        self.assertEqual(
+            re.sub("\n'monplugin_time.*\n", "", c.get_perfdata()),
+            "| 'used'=90.0;;;;"
+        )
+
     def test_message(self):
         c = Check('x')
 
