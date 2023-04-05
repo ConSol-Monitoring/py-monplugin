@@ -1,6 +1,7 @@
 import enum
 import io
 import re
+import time
 
 class Status(enum.Enum):
     OK       = 0
@@ -140,6 +141,8 @@ class Check:
             Status.CRITICAL: [],
         }
 
+        self.start_time = time.perf_counter()
+
     def set_threshold(self, threshold=None, **kwargs):
         if threshold:
             if isinstance(threshold, Threshold):
@@ -239,9 +242,11 @@ class Check:
         if self._perfdata:
             output.write("| ")
             output.write('\n'.join([ str(x) for x in self._perfdata ]))
+            output.write(f"\n'monplugin_time'={ time.perf_counter() - self.start_time :.6f}s\n")
 
         if self._perfmultidata:
             output.write("| ")
+            output.write(f"'monplugin::monplugin::time'={ time.perf_counter() - self.start_time :.6f}s ")
             for k,labels in self._perfmultidata.items():
                 entity, check = k
                 output.write(f"'{entity}::{check}::")
