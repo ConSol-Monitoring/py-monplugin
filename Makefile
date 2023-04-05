@@ -1,6 +1,10 @@
 dist:
 	python3 -m build
 
+.PHONY: clean
+clean:
+	rm -rf dist
+
 .PHONY: test
 test:
 	python3 -m unittest tests/*py
