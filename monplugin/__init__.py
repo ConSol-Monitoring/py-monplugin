@@ -18,6 +18,7 @@ import enum
 import io
 import re
 import time
+import warnings
 
 class Status(enum.Enum):
     OK       = 0
@@ -26,6 +27,9 @@ class Status(enum.Enum):
     UNKNOWN  = 3
 
 class MonIllegalInstruction(Exception):
+    pass
+
+class MonShortnameDeprecated(UserWarning):
     pass
 
 class Range:
@@ -146,8 +150,9 @@ class PerformanceLabel:
 
 
 class Check:
-    def __init__(self, shortname='unknown', threshold=None):
-        self.shortname = shortname
+    def __init__(self, shortname=None, threshold=None):
+        if shortname is not None:
+            warnings.warn("shortname is deprecated", MonShortnameDeprecated)
         self.set_threshold(threshold)
         self._perfdata = []
         self._perfmultidata = {}
@@ -186,7 +191,7 @@ class Check:
             raise MonIllegalInstruction("you already used add_perfdata")
 
         if not check:
-            check = self.shortname.lower() or "unknown"
+            check = "unknown"
 
         self._perfmultidata.setdefault((entity, check), [])
         self._perfmultidata[(entity,check)].append( PerformanceLabel(**kwargs) )
@@ -237,8 +242,7 @@ class Check:
         if isinstance(code, str):
             code = Status[code]
 
-        print("{name} {code} - {text}".format(
-            name=self.shortname,
+        print("{code}: {text}".format(
             code=code.name,
             text=message
         ))

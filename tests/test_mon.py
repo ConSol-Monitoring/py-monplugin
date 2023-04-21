@@ -140,7 +140,7 @@ class TestPerfromanceLabel(unittest.TestCase):
 
 class TestCheck(unittest.TestCase):
     def test_perfmulti(self):
-        c = Check('x')
+        c = Check()
         c.add_message('OK')
         c.add_perfmultidata('disk1', None, label='used', value='90')
         c.add_perfmultidata('disk1', None, label='free', value='10')
@@ -151,8 +151,8 @@ class TestCheck(unittest.TestCase):
 
         self.assertEqual(
             rmtime(c.get_perfdata()),
-                "| 'disk1::x::free'=10.0;;;; 'used'=90.0;;;;\n"
-                "'disk2::x::free'=5.0;;;; 'used'=95.0;;;;\n"
+                "| 'disk1::unknown::free'=10.0;;;; 'used'=90.0;;;;\n"
+                "'disk2::unknown::free'=5.0;;;; 'used'=95.0;;;;\n"
         )
 
         c = Check()
@@ -182,7 +182,7 @@ class TestCheck(unittest.TestCase):
         )
 
     def test_message(self):
-        c = Check('x')
+        c = Check()
 
         (code, message) = c.check_messages()
         self.assertEqual(code, Status.OK)
@@ -220,7 +220,7 @@ class TestCheck(unittest.TestCase):
         self.assertEqual(code, Status.CRITICAL)
         self.assertEqual(message, 'critical critical2; warning')
 
-        c = Check('x')
+        c = Check()
         c.add_message(Status.OK, 'ok1')
         c.add_message(Status.OK, 'ok2')
         c.add_message(Status.OK, 'ok3')
