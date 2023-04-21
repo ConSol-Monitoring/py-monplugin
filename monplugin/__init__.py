@@ -150,9 +150,9 @@ class PerformanceLabel:
 
 
 class Check:
-    def __init__(self, shortname=None, threshold=None):
+    def __init__(self, *, shortname=None, threshold=None):
         if shortname is not None:
-            warnings.warn("shortname is deprecated", MonShortnameDeprecated)
+            warnings.warn("Check.__init__(shortname=) is deprecated", MonShortnameDeprecated, stacklevel=2)
         self.set_threshold(threshold)
         self._perfdata = []
         self._perfmultidata = {}
