@@ -13,7 +13,7 @@
 #    You should have received a copy of the GNU General Public License
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from monplugin import Threshold, Range, Status, PerformanceLabel, Check
+from monplugin import Threshold, Range, Status, PerformanceLabel, Check, MonShortnameDeprecated
 import unittest
 import re
 
@@ -139,6 +139,13 @@ class TestPerfromanceLabel(unittest.TestCase):
         self.assertEqual(str(p), "'a b'=9.0kB;15;90:;;")
 
 class TestCheck(unittest.TestCase):
+    def test_init(self):
+        with self.assertRaises(TypeError):
+            Check('x')
+        with self.assertWarns(MonShortnameDeprecated):
+            Check(shortname="foo")
+        Check(threshold=None)
+
     def test_perfmulti(self):
         c = Check()
         c.add_message('OK')
