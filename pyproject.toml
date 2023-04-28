@@ -6,7 +6,7 @@ requires = ["flit_core >=3.2,<4"]
 name = "monplugin"
 readme = "README.md"
 description = "Partial python port of perls Monitoring::Plugin"
-version = "0.6.0"
+version = "0.6.1"
 requires-python = ">= 3.6"
 authors = [
     { name = "Danijel Tasov", email = "danijel.tasov@consol.de" }
