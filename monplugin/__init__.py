@@ -45,7 +45,7 @@ class Range:
         self._parse_range()
 
     def __str__(self):
-        return self.range_spec or ""
+        return str(self.range_spec or "")
 
     def __repr__(self):
         return f'Range({self.range_spec})'

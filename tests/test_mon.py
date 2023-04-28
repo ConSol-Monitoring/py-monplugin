@@ -19,6 +19,13 @@ import re
 
 
 class TestRange(unittest.TestCase):
+    def test_non_str(self):
+        try:
+            r = Range(5)
+            str(r)
+        except:
+            self.fail("Range(int) throwed exception")
+
     def test_num(self):
         r = Range('5')
         self.assertTrue(isinstance(r, Range))
