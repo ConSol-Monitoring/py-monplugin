@@ -24,7 +24,7 @@ class TestRange(unittest.TestCase):
             r = Range(5)
             str(r)
         except:
-            self.fail("Range(int) throwed exception")
+            self.fail("Range(int) hod a Iksäbtschn gschmissn")
 
     def test_num(self):
         r = Range('5')
