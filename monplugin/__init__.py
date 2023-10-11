@@ -26,6 +26,9 @@ class Status(enum.Enum):
     CRITICAL = 2
     UNKNOWN  = 3
 
+    def __lt__(self, other):
+        return self.value < other.value
+
 class MonIllegalInstruction(Exception):
     pass
 

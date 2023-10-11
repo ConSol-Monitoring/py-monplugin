@@ -17,6 +17,13 @@ from monplugin import Threshold, Range, Status, PerformanceLabel, Check, MonShor
 import unittest
 import re
 
+class TestStatus(unittest.TestCase):
+    def test_sort_status(self):
+        l=sorted([Status.CRITICAL, Status.OK, Status.UNKNOWN,  Status.WARNING])
+        self.assertEqual(l[0], Status.OK)
+        self.assertEqual(l[1], Status.WARNING)
+        self.assertEqual(l[2], Status.CRITICAL)
+        self.assertEqual(l[3], Status.UNKNOWN)
 
 class TestRange(unittest.TestCase):
     def test_non_str(self):
