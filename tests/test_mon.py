@@ -14,6 +14,7 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from monplugin import Threshold, Range, Status, PerformanceLabel, Check, MonShortnameDeprecated
+import monplugin
 import unittest
 import re
 
@@ -161,6 +162,7 @@ class TestCheck(unittest.TestCase):
         Check(threshold=None)
 
     def test_perfmulti(self):
+        monplugin.ICINGA=None
         c = Check()
         c.add_message('OK')
         c.add_perfmultidata('disk1', None, label='used', value='90')
@@ -197,9 +199,10 @@ class TestCheck(unittest.TestCase):
         c = Check()
         c.add_message('OK')
         c.add_perfdata(label='used', value=90)
+        c.add_perfdata(label='free', value=10)
         self.assertEqual(
             re.sub("\n'monplugin_time.*\n", "", c.get_perfdata()),
-            "| 'used'=90.0;;;;"
+            "| 'used'=90.0;;;;\n'free'=10.0;;;;"
         )
 
     def test_message(self):

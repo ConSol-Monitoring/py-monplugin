@@ -19,6 +19,10 @@ import io
 import re
 import time
 import warnings
+import os
+
+ICINGA = os.getenv("MONPLUGIN_ICINGA",
+                   os.getenv("I_SHOULD_HAVE_USED_NAEMON_INSTEAD", None))
 
 class Status(enum.Enum):
     OK       = 0
@@ -256,10 +260,16 @@ class Check:
     def get_perfdata(self):
         output = io.StringIO()
 
+        sep = "\n"
+
+        if ICINGA:
+            sep = " "
+
+
         if self._perfdata:
             output.write("| ")
-            output.write('\n'.join([ str(x) for x in self._perfdata ]))
-            output.write(f"\n'monplugin_time'={ time.perf_counter() - self.start_time :.6f}s\n")
+            output.write(sep.join([ str(x) for x in self._perfdata ]))
+            output.write(f"{sep}'monplugin_time'={ time.perf_counter() - self.start_time :.6f}s\n")
 
         if self._perfmultidata:
             output.write("| ")
@@ -269,7 +279,7 @@ class Check:
                 output.write(f"'{entity}::{check}::")
                 ps = " ".join(sorted([str(x) for x in labels]))
                 output.write(ps[1:])
-                output.write("\n")
+                output.write(sep)
 
         return output.getvalue()
 
